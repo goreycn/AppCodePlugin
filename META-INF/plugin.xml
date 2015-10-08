@@ -1,0 +1,51 @@
+<idea-plugin version="4">
+    <id>com.myid.codeplugin</id>
+    <name>CodeFormat and JsonModel creator</name>
+    <version>1.0</version>
+    <vendor email="goreyjp@qq.com" url="https://github.com/goreycn">Grubby</vendor>
+
+    <description><![CDATA[
+        It's an AppCode plugin: <BR>
+        1. code format with '=' alignment <BR>
+        2. create json model <BR>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        0.0.1 2015_10_08 init version
+    ]]>
+    </change-notes>
+
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="8000"/>
+
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!--&lt;!&ndash; uncomment to enable plugin in all products-->
+    <depends>com.intellij.modules.lang</depends>
+    <!--&ndash;&gt;-->
+
+    <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    </extensions>
+
+    <!--<application-components>-->
+    <!-- Add your application components here -->
+    <!--</application-components>-->
+
+    <!--<project-components>-->
+    <!-- Add your project components here -->
+    <!--</project-components>-->
+
+    <actions>
+        <!-- Add your actions here -->
+        <action class="MainAction" id="org.lyner.codeplugin.MainAction" text="=格式化">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+
+        <action class="CreateJsonModel" id="CreateJsonModel" text="创建JsonModel">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+
+    </actions>
+
+</idea-plugin>
