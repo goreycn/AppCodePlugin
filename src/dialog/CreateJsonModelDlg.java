@@ -95,6 +95,9 @@ public class CreateJsonModelDlg extends JDialog {
         ArrayList<String> propList = getPropListByPrefix(_prefix);
 
         for (String key : rootJson.keySet()) {
+
+            String _key = key.substring(0,1).toUpperCase() + key.substring(1);
+
             // 值类型
             Object obj = rootJson.get(key);
             String valueType = obj.getClass().getSimpleName();
@@ -112,12 +115,12 @@ public class CreateJsonModelDlg extends JDialog {
                 propList.add("@property (nonatomic, assign) CGFloat " + key + ";");
             }
             else if (valueType.equals("JSONObject")){
-                propList.add("@property (nonatomic, strong) " + _prefix + key + "*" + key + ";");
+                propList.add("@property (nonatomic, strong) " + _prefix + _key + "*" + key + ";");
                 createWith(key, (JSONObject)obj);
             }
             else if (valueType.equals("JSONArray")){
-                propList.add("@property (nonatomic, strong) NSArray<" + _prefix + key + "> *" + key + ";");
-                protocolKeys.add(key);
+                propList.add("@property (nonatomic, strong) NSArray<" + _prefix + _key + "> *" + key + ";");
+                protocolKeys.add(_key);
                 JSONArray objArr = (JSONArray)obj;
 
                 // 这里假定, 不存在 数组下面直接使用数组的场合
