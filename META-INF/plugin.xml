@@ -25,7 +25,7 @@
     <!--&ndash;&gt;-->
 
     <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+        <!-- Add your extensions here -->
     </extensions>
 
     <!--<application-components>-->
@@ -38,11 +38,20 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action class="MainAction" id="org.lyner.codeplugin.MainAction" text="=格式化">
+
+        <action class="UIViewCreateAction" id="UI_GET_CreateAction" text="UI_GET_代码生成器">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+
+        <action class="BaseCellAction" id="MySampleAction" text="BaseCell_代码生成器">
             <add-to-group group-id="GenerateGroup" anchor="first"/>
         </action>
 
         <action class="CreateJsonModel" id="CreateJsonModel" text="创建JsonModel">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+
+        <action class="MainAction" id="org.lyner.codeplugin.MainAction" text="=格式化">
             <add-to-group group-id="GenerateGroup" anchor="first"/>
         </action>
 
