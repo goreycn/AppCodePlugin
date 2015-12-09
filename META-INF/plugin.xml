@@ -1,6 +1,6 @@
 <idea-plugin version="4">
     <id>com.myid.codeplugin</id>
-    <name>CodeFormat and JsonModel creator</name>
+    <name>-= Gorey's Tool Kit =-</name>
     <version>1.0</version>
     <vendor email="goreyjp@qq.com" url="https://github.com/goreycn">Grubby</vendor>
 
@@ -55,6 +55,9 @@
             <add-to-group group-id="GenerateGroup" anchor="first"/>
         </action>
 
+        <action class="BaseViewControllerAction" id="BaseViewControllerAction" text="VC_代码生成器">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
     </actions>
 
 </idea-plugin>

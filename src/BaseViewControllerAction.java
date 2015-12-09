@@ -5,22 +5,20 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.jetbrains.cidr.lang.autoImport.OCAutoImportHelper;
 import com.jetbrains.cidr.lang.psi.*;
-import com.jetbrains.cidr.lang.quickfixes.OCImportSymbolFix;
 import com.jetbrains.cidr.lang.util.OCElementFactory;
+import org.apache.velocity.runtime.directive.Foreach;
 
 import java.util.List;
 
 /**
- * Created by goreyjp on 15/10/28.
+ * Created by goreyjp on 15/11/4.
  */
-public class BaseCellAction extends AnAction {
+public class BaseViewControllerAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
         final Project project = event.getProject();
@@ -50,17 +48,16 @@ public class BaseCellAction extends AnAction {
                 String strUpdateConstrains = generateUpdateConstrainsMethodBy(listProperty);
                 OCMethod methodUpdateConstrains = OCElementFactory.methodFromText(strUpdateConstrains, ocImpl, true);
 
-                OCMethod firstMethod = ocImpl.getMethods().get(0);
+                OCMethod viewDidLoadMethod = getViewDidLoadMethod(ocImpl);
 
-                codeStyleManager.reformat(ocImpl.addAfter(methodUpdateConstrains, firstMethod));
+                codeStyleManager.reformat(ocImpl.addAfter(methodUpdateConstrains, viewDidLoadMethod));
 
                 // 添加初化方法
                 String strInit = generateAddSubviewMethodBy(listProperty);
                 OCMethod methodInit = OCElementFactory.methodFromText(strInit, ocImpl, true);
-                codeStyleManager.reformat(ocImpl.addAfter(methodInit, firstMethod));
+                codeStyleManager.reformat(ocImpl.addAfter(methodInit, viewDidLoadMethod));
 
-
-               // 添加Get方法
+                // 添加Get方法
                 for (OCProperty p : listProperty) {
                     // 属性类型名
                     String typeName = p.getDeclaration().getType().getName();
@@ -77,17 +74,17 @@ public class BaseCellAction extends AnAction {
                     }
                 }
 
-                // 添加 cellHeight 方法
-//                String cellHeightStr = "+ (CGFloat)cellHeight {\n" +
-//                        "    return 44;\n" +
-//                        "}\n";
-//                OCMethod cellHeightMethod = OCElementFactory.methodFromText(cellHeightStr, ocImpl, true);
-//                codeStyleManager.reformat(ocImpl.addAfter(cellHeightMethod, ocImpl.getMethods().get(ocImpl.getMethods().size() - 1)));
-
             }
 
+            private OCMethod getViewDidLoadMethod(OCImplementation ocImpl) {
+                for (OCMethod m : ocImpl.getMethods()) {
+                    if (m.getName().equals("viewDidLoad")) {
+                        return m;
+                    }
+                }
+                return null;
+            }
         };
-
         WriteCommandAction.runWriteCommandAction(project, r);
     }
 
@@ -102,14 +99,13 @@ public class BaseCellAction extends AnAction {
 
         StringBuffer sb = new StringBuffer();
         sb.append("- (void)updateConstraints {\n" +
-                "UIView *sv = self.contentView;\n");
+                "UIView *sv = self.view;\n");
 
         for (OCProperty p : listProperty) {
             String str = createConstrainsTemplateStringBy(p);
             sb.append(str);
         }
-
-        sb.append("    [super updateConstraints];\n}\n");
+        sb.append("}\n");
         return sb.toString();
     }
 
@@ -122,20 +118,21 @@ public class BaseCellAction extends AnAction {
     String generateAddSubviewMethodBy(List<OCProperty> listProperty) {
 
         StringBuffer sb = new StringBuffer();
-        sb.append("- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {\n" +
-                "    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];" +
-                "    if (self) {");
+        sb.append("- (void)viewDidLoad {\n" +
+                "    [super viewDidLoad];\n" +
+                "    self.edgesForExtendedLayout = UIRectEdgeNone;\n" +
+                "    self.view.backgroundColor = APP_COLOR_BG;" +
+                "    self.navigationItem.title = @\"\";");
 
         for (OCProperty p : listProperty) {
             // 属性变量名
             String varName = p.getDeclaration().getDeclarators().get(0).getName();
-            String str = "[self.contentView addSubview:self." + varName + "];\n";
+            String str = "[self.view addSubview:self." + varName + "];\n";
             sb.append(str);
         }
 
         sb.append(" [self updateConstraints];\n" +
                 "    }\n" +
-                "    return self;\n" +
                 "}\n");
         return sb.toString();
     }
@@ -159,11 +156,9 @@ public class BaseCellAction extends AnAction {
     private boolean isUIVar(String varName) {
         if (varName.startsWith("v")) {
             return true;
-        }
-        else if (varName.startsWith("cell")) {
+        } else if (varName.startsWith("cell")) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -181,6 +176,4 @@ public class BaseCellAction extends AnAction {
             return false;
         }
     }
-
-
 }

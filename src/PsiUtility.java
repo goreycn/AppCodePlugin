@@ -113,15 +113,33 @@ public class PsiUtility {
                 "    if (_" + varName + ") return _" + varName + ";");
 
         if ("UILabel".equals(typeName)) {
-            sb.append("_" + varName + " = [UILabel labelWithTitle:@\"标题\" fontSize:APP_FONT_SIZE_M color:APP_COLOR_DARK_GRAY];\n");
+            sb.append("_" + varName + " = [UILabel labelWithTitle:@\"\" fontSize:APP_FONT_SIZE_M color:APP_COLOR_DARK_GRAY];\n");
         } else if ("UIView".equals(typeName)) {
             sb.append("_" + varName + " = [UIView viewWithColor:APP_COLOR_CLEAR frame:CGRectZero];\n");
         } else if ("UITextField".equals(typeName)) {
-            sb.append("_" + varName + " = [UITextField textFiledWithText:@\"输入框\" placehold:@\"请输入\" fontSize:APP_FONT_SIZE_M];\n");
+            sb.append("_" + varName + " = [UITextField textFiledWithText:@\"\" placehold:@\"请输入\" fontSize:APP_FONT_SIZE_M];\n");
         } else if ("UIButton".equals(typeName)) {
-            sb.append("_" + varName + " = [UIButton buttonWithTitle:@\"登录\" fontSize:APP_FONT_SIZE_M color:APP_COLOR_DARK_GRAY del:self sel:@selector(" + varName + "OnClicked:)];\n");
+            sb.append("_" + varName + " = [UIButton buttonWithImageNor:@\"\" imageSel:@\"\" del:self sel:@selector(" + varName + "OnClicked:)];\n");
+            sb.append("_" + varName + " = [UIButton buttonWithTitle:@\"Btn\" fontSize:APP_FONT_SIZE_M color:APP_COLOR_DARK_GRAY del:self sel:@selector(" + varName + "OnClicked:)];\n");
+            sb.append("_" + varName + " = [UIButton hw_redButtonWithTitle:@\"完成\" del:self sel:@selector(" + varName + "OnClicked:)];\n");
+            sb.append("_" + varName + " = [UIButton hw_roundButtonWithTitle:@\"完成\" titleColor:APP_COLOR_WHITE bgColor:APP_COLOR_BLUE];\n");
+            sb.append("[_" + varName + " addTarget:self action:@selector(" + varName + "OnClicked:) forControlEvents:UIControlEventTouchUpInside];\n");
         } else if ("UIImageView".equals(typeName)) {
             sb.append("_" + varName + " = [UIImageView imageViewWithImage:[UIImage imageNamed:@\"\"]];\n");
+        } else if ("tableView".equals(varName)) {
+            sb.append(
+                    "    _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];\n" +
+                    "    _tableView.delegate = self;\n" +
+                    "    _tableView.dataSource = self;\n" +
+                    "    _tableView.backgroundView = nil;\n" +
+                    "    _tableView.backgroundColor = APP_COLOR_CLEAR;\n");
+        }
+        else if ("InputCellView".equals(typeName)){
+
+            String subName = varName.substring(1);
+            sb.append("_" + varName + " = [[" + typeName + " alloc] init];");
+            sb.append("    [_" + varName + " addTitleLabel:self.lb" + subName+ "];\n" +
+                    "    [_" + varName + " addInputField:self.tf" + subName+ "];\n");
         } else {
             sb.append("_" + varName + " = [[" + typeName + " alloc] init];");
         }
@@ -134,6 +152,7 @@ public class PsiUtility {
 
     /**
      * 创建响应方法
+     *
      * @param typeName
      * @param varName
      * @param impl
@@ -141,7 +160,7 @@ public class PsiUtility {
      */
     public static OCMethod createActionClickMethodWith(String typeName, String varName, OCImplementation impl) {
         StringBuffer sb = new StringBuffer();
-        sb.append("- (void)btnNameOnClicked:(id)sender{\n" +
+        sb.append("- (void)" + varName + "OnClicked:(id)sender{\n" +
                 "    \n" +
                 "}\n");
         OCMethod method = OCElementFactory.methodFromText(sb.toString(), impl, true);

@@ -73,7 +73,8 @@ public class CreateJsonModelDlg extends JDialog {
         entityKeys.clear();
         protocolKeys.clear();
 
-        createWith(_prefix, rootJson);
+        ClassNamePrefix = _prefix;
+        createWith(ClassNamePrefix, rootJson);
 
         System.out.print(entityMap);
         if (myIf != null){
@@ -82,6 +83,7 @@ public class CreateJsonModelDlg extends JDialog {
         dispose();
     }
 
+    String ClassNamePrefix = "";
 
     /**
      * 可以递归使用
@@ -115,16 +117,25 @@ public class CreateJsonModelDlg extends JDialog {
                 propList.add("@property (nonatomic, assign) CGFloat " + key + ";");
             }
             else if (valueType.equals("JSONObject")){
-                propList.add("@property (nonatomic, strong) " + _prefix + _key + "*" + key + ";");
+                propList.add("@property (nonatomic, strong) " + ClassNamePrefix + _key + "*" + key + ";");
                 createWith(key, (JSONObject)obj);
             }
             else if (valueType.equals("JSONArray")){
-                propList.add("@property (nonatomic, strong) NSArray<" + _prefix + _key + "> *" + key + ";");
-                protocolKeys.add(_key);
+
                 JSONArray objArr = (JSONArray)obj;
 
                 // 这里假定, 不存在 数组下面直接使用数组的场合
-                createWith(key, (JSONObject)objArr.get(0));
+                if (objArr.length() > 0) {
+
+                    propList.add("@property (nonatomic, strong) NSArray<" + ClassNamePrefix + _key + "> *" + key + ";");
+                    protocolKeys.add(_key);
+
+                    createWith(key, (JSONObject)objArr.get(0));
+                }
+                else {
+                    propList.add("@property (nonatomic, strong) NSArray *" + key + ";");
+                }
+
             }
         }
     }
