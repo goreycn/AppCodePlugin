@@ -163,6 +163,14 @@ public class CreateJsonModelDlg extends JDialog {
         dispose();
     }
 
+    public JTextField getTfPrefix() {
+        return tfPrefix;
+    }
+
+    public JTextArea getTaJsonSample() {
+        return taJsonSample;
+    }
+
     public static void main(String[] args) {
         CreateJsonModelDlg dialog = new CreateJsonModelDlg();
         dialog.pack();

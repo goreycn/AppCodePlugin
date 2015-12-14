@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDirectory;
@@ -12,12 +13,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.awt.RelativePoint;
+import com.jetbrains.cidr.lang.psi.*;
 import dialog.CreateJsonModelDlg;
 import javafx.application.Application;
 import org.apache.velocity.runtime.directive.Foreach;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by goreyjp on 15/9/29.
@@ -30,21 +36,46 @@ public class CreateJsonModel extends AnAction implements CreateJsonModelDlg.MyIf
     public void actionPerformed(AnActionEvent event) {
         _event = event;
 
+        final Editor editor = _event.getData(PlatformDataKeys.EDITOR);
+
+        String selectedFileName = editor.getSelectionModel().getSelectedText();
+
         CreateJsonModelDlg dialog = new CreateJsonModelDlg();
         dialog.pack();
         dialog.setMyIf(this);
+
+        // 选中的文本为 默认的Model名
+        if (selectedFileName.length() > 0) {
+            dialog.getTfPrefix().setText(selectedFileName);
+        }
+
+        // 从剪贴板里 拿到 json
+        String json = null;
+        try {
+            json = (String) CopyPasteManager.getInstance().getContents().getTransferData(DataFlavor.stringFlavor);
+            if (json.length() > 0) {
+                dialog.getTaJsonSample().setText(json);
+            }
+        } catch (UnsupportedFlavorException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         dialog.setSize(500, 500);
+
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+
     }
+
 
     @Override
     public void myMethod(final String classNamePrefix, final ArrayList keyList, final HashMap entityMap, final ArrayList protocolList, final String baseClassName) {
         Project project = _event.getProject();
         final Editor editor = _event.getData(PlatformDataKeys.EDITOR);
         final Document doc = _event.getRequiredData(CommonDataKeys.EDITOR).getDocument();
-
-
 
         Runnable r = new Runnable() {
             @Override
@@ -112,6 +143,7 @@ public class CreateJsonModel extends AnAction implements CreateJsonModelDlg.MyIf
                 sb.append("\n");
                 int offset = editor.getCaretModel().getOffset();
                 doc.insertString(offset, sb.toString());
+
             }
         };
         WriteCommandAction.runWriteCommandAction(project, r);
